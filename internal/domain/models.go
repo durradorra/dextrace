@@ -62,3 +62,8 @@ type GlucoseDataResponse struct {
 	ErrorData interface{} `json:"errorData"`
 	Success   bool        `json:"success"`
 }
+
+type GetDataResponse struct {
+	Timestamp string       `json:"timestamp"`
+	Value     float64     `json:"value"`
+}

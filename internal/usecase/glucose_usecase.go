@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/brkss/dextrace/internal/domain"
+	"github.com/brkss/dextrace/internal/utils"
 )
 
 type SibionicUseCase struct {
@@ -18,7 +19,7 @@ func NewSibionicUseCase(authRepo domain.AuthRepository, glucoseRepo domain.Gluco
 	}
 }
 
-func (uc *SibionicUseCase) GetGlucoseData(user domain.User, userID string) (*domain.GlucoseDataResponse, error) {
+func (uc *SibionicUseCase) GetGlucoseData(user domain.User, userID string) (*[]domain.GetDataResponse, error) {
 	token, err := uc.authRepo.Login(user)
 	if err != nil {
 		return nil, fmt.Errorf("failed to login: %w", err)
@@ -29,5 +30,13 @@ func (uc *SibionicUseCase) GetGlucoseData(user domain.User, userID string) (*dom
 		return nil, fmt.Errorf("failed to get glucose data: %w", err)
 	}
 
-	return data, nil
+	var response []domain.GetDataResponse
+	for _, glucose := range data.Data.GlucoseInfos {
+		response = append(response, domain.GetDataResponse{
+			Timestamp: glucose.T,
+			Value:     utils.ConvertToMgdl(glucose.V),
+		})
+	}
+
+	return &response, nil
 }
